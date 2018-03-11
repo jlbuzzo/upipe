@@ -3,58 +3,59 @@
 # A Makefile to rule'em all!
 #
 ###############################################################################
+all:
 
 
 
 
 
-############################# PREAMBLE ######################################## 
-# Ancillary files.
-include variables.mk
-include macros.mk
-#include functions.mk
-#include commands.mk
+############################## PREAMBLE ####################################### 
+# Essential source files to include.
+SOURCES ?= $(abspath ./src)
+aux := $(strip $(wildcard $(SOURCES)/*.mk))
+include $(if $(aux), $(SOURCES)/*.mk, $(error Sources not found!))
 
-#$(call presentation, $(PIPELINE_NAME),asfd2)
-#export INPUT_FILE
+# Ancillary configuration file (user's).
+CONFIG_FILE ?= ./config.cfg
+CONFIG_FILE := $(strip $(wildcard $(CONFIG_FILE)))
+include $(if $(CONFIG_FILE), $(CONFIG_FILE), $(error Configuration file not found!))
+
+# Define a CALL message for the log.
+CALL = [$(shell /bin/date "+%Y-%m-%d(%H:%M:%S)") $(PIPELINE_NAME)]
 
 
-############################# MAIN CODE ######################################## 
 
-all: processSample
-	$(call show, All processes finished.)
+############################## MAIN CODE ######################################
+
+# Presentation header.
+$(call presentation,                               $(PIPELINE_NAME), With upipe!)
+
+
+# All processes complete.
+all: $(pst_proc)
+	$(info )
+	$(info $(CALL) All processes complete.)
 
 # Post processing stage.
-post_processing: main_processing
-	$(call show, Post processing...)
-	#$(post_proc)
+$(pst_proc): $(mn_proc)
 
 # Main processing stage.
-main_processing: pre_processing
-	$(call show, Main processing...)
-	#$(m_proc)
+$(mn_proc): $(pre_proc)
 
 # Pre processing stage.
-pre_processing: validations
-	$(call show, Pre processing...)
-	#make -f processSample
+$(pre_proc): $(val_proc)
 
-# Verify and validate inputs.
-validations:
-	$(call show, Validating inputs...)
-	#$(validate)
+# Inputs' validation processing stage.
+$(val_proc):
 
 # Extra processes for further customizations.
-extra:
-	$(call show, Extra processing...)
-	#$(extra)
+$(ext_proc):
 
 
-# Rule files.
-include processSample.mk
-#include mergeCall.mk
+# Including targets definitions files.
+include $(strip $(wildcard $(addprefix $(MODULES)/$(MODULE_NAME)/, $(TGT_DEFS))))
+#include $(EXT_TGT)
 
 
-
-.PHONY: all
+.PHONY:# all pre_proc mn_proc pst_proc val_proc ext_proc
 ###############################################################################

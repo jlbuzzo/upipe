@@ -28,6 +28,5 @@ while read line; do
 	fi;
 done < $3
 
-# Print.
-find $1/genes -name '*.abnormal' -exec wc -l '{}' \;
-
+# Print and exit.
+find $1/genes -type f -name '*.abnormal' | wc -l
