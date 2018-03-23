@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-
+pth := $(MODULES)/$(MODULE_NAME)
 
 
 #################
@@ -29,7 +29,7 @@ $(OUTPUT_DIR)/reference/genes.formated: $(OUTPUT_DIR)/reference/genes.bed | $(OU
 $(OUTPUT_DIR)/reference/genes.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
 	$(info )
 	$(info Make genes.bed.)
-	perl library/src/gtf2bed.pl 'gene' $< > $@
+	perl $(pth)/gtf2bed.pl 'gene' $< > $@
 	@echo "$(timestamp) $(PIPELINE_NAME): Created genes bed at: $(OUTPUT_DIR)/reference/genes.bed\n" >> $(LOG_FILE)
 
 
@@ -37,7 +37,7 @@ $(OUTPUT_DIR)/reference/genes.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
 $(OUTPUT_DIR)/reference/exons.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
 	$(info )
 	$(info Make exons.bed.)
-	perl library/src/gtf2bed.pl 'exon' $< > $@
+	perl $(pth)/gtf2bed.pl 'exon' $< > $@
 	@echo "$(timestamp) $(PIPELINE_NAME): Created exons bed at: $(OUTPUT_DIR)/reference/exons.bed\n" >> $(LOG_FILE)
 
 
@@ -48,23 +48,23 @@ $(OUTPUT_DIR)/reference/exons.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
 #
 #################
 
-$(OUTPUT_DIR)/$(SAMPLE_ID):
+$(OUTPUT_DIR):
 	$(info )
 	$(info Make output dir.)
-	mkdir -p $(OUTPUT_DIR)/$(SAMPLE_ID)
-	@echo "$(timestamp) $(PIPELINE_NAME): Created results dir: $(OUTPUT_DIR)/$(SAMPLE_ID)\n" >> $(LOG_FILE)
+	mkdir -p $(OUTPUT_DIR)
+	@echo "$(timestamp) $(PIPELINE_NAME): Created output dir: $(OUTPUT_DIR).\n"
 
 $(OUTPUT_DIR)/reference:
 	$(info )
 	$(info Make reference dir.)
 	mkdir -p $(OUTPUT_DIR)/reference
-	@echo "$(timestamp) $(PIPELINE_NAME): Created results dir: $(OUTPUT_DIR)/$(SAMPLE_ID)\n" >> $(LOG_FILE)
+	@echo "$(timestamp) $(PIPELINE_NAME): Created reference dir: $(OUTPUT_DIR)/reference.\n"
 
 $(OUTPUT_DIR)/result:
 	$(info )
 	$(info Make result dir.)
 	mkdir -p $(OUTPUT_DIR)/result
-	@echo "$(timestamp) $(PIPELINE_NAME): Created results dir: $(OUTPUT_DIR)/$(SAMPLE_ID)\n" >> $(LOG_FILE)
+	@echo "$(timestamp) $(PIPELINE_NAME): Created results dir: $(OUTPUT_DIR)/result.\n"
 
 $(TEMP_PROCESS_DIR):
 	$(info )

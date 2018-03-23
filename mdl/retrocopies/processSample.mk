@@ -14,7 +14,7 @@
 #
 #################
 
-processSample: $(BAM_ABNORMAL_LIST)
+processSample:: $(BAM_ABNORMAL_LIST)
 	$(info )
 	$(info $(CALL) Finished processing for files: $^.)
 
@@ -29,7 +29,7 @@ processSample: $(BAM_ABNORMAL_LIST)
 $(BAM_ABNORMAL_LIST): %.abnormal: %.bai %.bam $(OUTPUT_DIR)/reference/genes.formated
 	$(info )
 	$(info $(CALL) Selecting abnormal pairs from file $(word 2, $^))
-	$(MODULES)/$(MODULE_NAME)/findAbnormal.sh $(@D) $(word 2, $^) $(word 3, $^) > $@
+	$(MDL)/findAbnormal.sh $(word 3, $^) $(word 2, $^) $(@D) > $@
 
 
 
@@ -42,7 +42,7 @@ $(BAM_ABNORMAL_LIST): %.abnormal: %.bai %.bam $(OUTPUT_DIR)/reference/genes.form
 %.bai: %.bam
 	$(info )
 	$(info $(CALL) Indexing file $<)
-	samtools index -b -m 10G -@ 20 $< $@ 
+	samtools index -b -@ 20 $< $@ 
 
 
 
@@ -66,11 +66,7 @@ $(notdir $(BAM_FINAL_LIST)): %.bam: $(BAM_LIST) | $(OUTPUT_DIR)
 	mkdir -p $(OUTPUT_DIR)/$*
 	if [ "$(CMD)" != "SO:coordinate" ]; then \
 		samtools sort -O BAM -m 10G -@ 20 $(REQ) -o $(TGT); \
-	elif [ -L "$(REQ)" ]; then \
-		echo copiou!; \
-		ln -sf $(shell readlink -f $(REQ)) $(TGT); \
 	else \
-		echo Não precisou copiar!; \
-		ln -sf $(REQ) $(TGT); \
+		ln -sf $(shell readlink -f $(REQ)) $(TGT); \
 	fi
 

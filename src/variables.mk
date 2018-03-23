@@ -3,6 +3,7 @@
 # Essential configuration paths.
 SOURCES ?= ./src
 MODULES ?= ./mdl
+MODULE_NAME :=
 LIBRARIES ?= ./lib
 BINARIES ?= ./bin
 DOCS ?= ./doc

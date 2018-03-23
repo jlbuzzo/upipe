@@ -23,6 +23,8 @@ include $(if $(CONFIG_FILE), $(CONFIG_FILE), $(error Configuration file not foun
 # Define a CALL message for the log.
 CALL = [$(shell /bin/date "+%Y-%m-%d(%H:%M:%S)") $(PIPELINE_NAME)]
 
+# Shortcut to modules path.
+MDL := $(MODULES)/$(MODULE_NAME)
 
 
 ############################## MAIN CODE ######################################
@@ -31,6 +33,7 @@ CALL = [$(shell /bin/date "+%Y-%m-%d(%H:%M:%S)") $(PIPELINE_NAME)]
 $(call presentation,                               $(PIPELINE_NAME), With upipe!)
 
 
+# TARGETS' CHAIN.
 # All processes complete.
 all: $(pst_proc)
 	$(info )
@@ -40,10 +43,10 @@ all: $(pst_proc)
 $(pst_proc): $(mn_proc)
 
 # Main processing stage.
-$(mn_proc): $(pre_proc)
+$(mn_proc):: $(pre_proc)
 
 # Pre processing stage.
-$(pre_proc): $(val_proc)
+$(pre_proc):: $(val_proc)
 
 # Inputs' validation processing stage.
 $(val_proc):
@@ -52,10 +55,11 @@ $(val_proc):
 $(ext_proc):
 
 
+
 # Including targets definitions files.
 include $(strip $(wildcard $(addprefix $(MODULES)/$(MODULE_NAME)/, $(TGT_DEFS))))
-#include $(EXT_TGT)
+#include $(TGT_EXT)
 
 
-.PHONY:# all pre_proc mn_proc pst_proc val_proc ext_proc
+#.PHONY: $(TGT_PHONY)
 ###############################################################################

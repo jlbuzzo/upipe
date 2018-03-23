@@ -20,9 +20,8 @@ $(info *** VALIDATION PROCESSES ***)
 INPUT_FILE := $(strip $(INPUT_FILE))
 $(if $(INPUT_FILE),, $(error Variabe INPUT_FILE is undefined))
 
-
 # Specifying and select INPUT_FILEs from a list with a suffix or from a directory.
-BAM_LIST := $(if $(shell [ -f $(INPUT_FILE) ] && echo 1), $(wildcard $(filter %$(SUFFIXES), $(shell cat $(INPUT_FILE)))), $(wildcard $(INPUT_FILE)/*$(SUFFIXEX)))
+BAM_LIST := $(if $(shell [ -f $(INPUT_FILE) ] && echo 1), $(wildcard $(filter %$(SUFFIXES), $(shell cat $(INPUT_FILE)))), $(wildcard $(INPUT_FILE)/*$(SUFFIXES)))
 BAM_LIST := $(abspath $(strip $(BAM_LIST)))
 VERIFY = $(shell [ -s "$i" ] && echo "$i")
 BAM_LIST := $(strip $(foreach i, $(BAM_LIST),$(VERIFY)))
@@ -50,6 +49,18 @@ BAM_ABNORMAL_LIST := $(patsubst %.bam, %.abnormal, $(BAM_FINAL_LIST))
 # Define .log files.
 LOG_FILE_LIST := $(addprefix $(OUTPUT_DIR)/, $(addsuffix .log, $(BAM_BASENAME_LIST)))
 
+# This is in wrong place.
+FILE_NAME := $(notdir $(INPUT_FILE))
+ifneq ($(SAMPLE_NAME),NULL)
+       SAMPLE_ID := $(FILE_NAME)
+endif
 
-$(info *** VALIDATION COMPLETE ***)
+LOG_FILE := $(OUTPUT_DIR)/$(SAMPLE_ID).log
+timestamp = `/bin/date "+%Y-%m-%d(%H:%M:%S)"`
 
+
+# Unic target.
+validations:
+	$(info )
+	$(info Finished validations for files $^.)
+	$(info *** VALIDATION COMPLETE ***)

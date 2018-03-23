@@ -5,28 +5,36 @@
 # $2: FINAL_BAM_FILE.
 # $3: *.formated file.
 
+# Counting time.
+timeini=$(date +%s.%n)
+
+# Destiny folder.
+FDR=$3/genes
 
 # Clean and create temporary path to store temporary files.
-rm -Rf $1/genes
-mkdir -p $1/genes
+[[ -d "$FDR" ]] && rm -Rf $FDR
+mkdir -p $FDR
+
 
 # For each gene, create a temporary file with abnormal alignments.
-while read line; do
-	GENE=$(echo $line | awk -F "[*][*]" '{print $4}')
-	CHR=$(echo $line | awk -F "[*][*]" '{print $1}' | sed 's/chr//i')
-	START=$(echo $line | awk -F "[*][*]" '{print $2}')
-	END=$(echo $line | awk -F "[*][*]" '{print $3}')
-
+sed -e 's/\*\*/ /g' $1 | while read CHR START END GENE; do
+	#CHR=$(sed 's/chr//i' <<< $CHR)
+	#echo "c-$CHR st-$START ed-$END gn-$GENE; $2 do"
+	
 	samtools view $2 $CHR:$START-$END | awk '
 		{
 			if ( ( $7 == "=" && ( $9 > 100000 || $9 < -100000) ) || ( $7 != "=" && $7 != "*" ) )
 				print "chr"$3"\t"$4"\tchr"$7"\t"$8
-		}' | sed 's/chrchr/chr/g' > $1/genes/$GENE.abnormal 2> /dev/null
+		}' | sed 's/chrchr/chr/g' > $FDR/$GENE.abnormal 2> /dev/null
 	
-	if [[ ! -s $1/genes/$GENE.abnormal ]]; then
-		rm $1/genes/$GENE.abnormal
+	if [[ ! -s $FDR/$GENE.abnormal ]]; then
+		rm $FDR/$GENE.abnormal
 	fi;
-done < $3
+done
+
+# Count time.
+timeend=$(date +%s.%n)
+echo "timeini-timeend" > rtc.log
 
 # Print and exit.
-find $1/genes -type f -name '*.abnormal' | wc -l
+find $FDR -type f -name '*.abnormal' -exec wc -l '{}' ';'
