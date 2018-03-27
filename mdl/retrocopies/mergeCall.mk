@@ -191,29 +191,31 @@ $(RES)/putativeins.min: $(RES)/putativeins
 #
 #################
 
-$(RES)/putativeins: $(REF)/genes.formated | $(RES)
+#$(RES)/putativeins: $(REF)/genes.formated | $(RES)
+$(RES)/putativeins: $(REF)/genes.bed | $(RES)
 	$(info )
 	$(info $(CALL) Make $@.)
 	#Foreach gene
 	@echo "$(CALL): Clustering abnormals in $(OUTPUT_DIR)/ into $@.\n"
-	RAND=$$(echo $$RANDOM); \
-	SAMPLES=$$(find -L $(OUTPUT_DIR)/ -type d -name genes); \
-	for j in $$(cat $(REF)/genes.formated ); do \
-		GENE=$$(echo $$j | awk -F "[*][*]" '{print $$4}'); \
-		echo $$GENE >> $@.processed; \
-		CHR=$$(echo $$j | awk -F "[*][*]" '{print $$1}') ; \
-		START=$$(echo $$j | awk -F "[*][*]" '{print $$2}'); \
-		END=$$(echo $$j | awk -F "[*][*]" '{print $$3}'); \
-		for i in $$SAMPLES; do \
-			echo $$i >> $@.processed; \
-			SAMPLE_NAME=$$(echo $$i | awk -F "/" '{print $$(NF-1)}');\
-			cat $$i/"$$GENE".abnormal; \
-		done | \
-		sort -k3,3V -k4,4n | \
-		egrep -v "GL|NC|chrMT|hs|chrM" | \
-		perl $(MDL)/cluster_pair.pl -w 4000 -s 5| \
-		sort -n -k 11 | \
-		awk -v gene="$$j" -v start=$$START -v end=$$END '{ if ( ! ($$6 == "=" && (int($$7) >= int(start) && int($$8) <= int(end)) ) ) {print $$1,$$2,$$3,$$4,$$5,$$6,$$7,$$8,$$9,$$10,$$11,gene} else {print $$1,$$2,$$3,$$4,$$5,"removed"}}'; \
-	done > $@
+	#RAND=$$(echo $$RANDOM); \
+	#SAMPLES=$$(find -L $(OUTPUT_DIR)/ -type d -name genes); \
+	#for j in $$(cat $(REF)/genes.formated ); do \
+	#	GENE=$$(echo $$j | awk -F "[*][*]" '{print $$4}'); \
+	#	echo $$GENE >> $@.processed; \
+	#	CHR=$$(echo $$j | awk -F "[*][*]" '{print $$1}') ; \
+	#	START=$$(echo $$j | awk -F "[*][*]" '{print $$2}'); \
+	#	END=$$(echo $$j | awk -F "[*][*]" '{print $$3}'); \
+	#	for i in $$SAMPLES; do \
+	#		echo $$i >> $@.processed; \
+	#		SAMPLE_NAME=$$(echo $$i | awk -F "/" '{print $$(NF-1)}');\
+	#		cat $$i/"$$GENE".abnormal; \
+	#	done | \
+	#	sort -k3,3V -k4,4n | \
+	#	egrep -v "GL|NC|chrMT|hs|chrM" | \
+	#	perl $(MDL)/cluster_pair.pl -w 4000 -s 5| \
+	#	sort -n -k 11 | \
+	#	awk -v gene="$$j" -v start=$$START -v end=$$END '{ if ( ! ($$6 == "=" && (int($$7) >= int(start) && int($$8) <= int(end)) ) ) {print $$1,$$2,$$3,$$4,$$5,$$6,$$7,$$8,$$9,$$10,$$11,gene} else {print $$1,$$2,$$3,$$4,$$5,"removed"}}'; \
+	#done > $@
+	$(MDL)/merge.sh $< $(MDL) $(OUTPUT_DIR) > $@
 	@echo "$(CALL): Finished clustering abnormals in $(OUTPUT_DIR)/ into $@.\n"
 

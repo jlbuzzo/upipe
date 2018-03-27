@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-pth := $(MODULES)/$(MODULE_NAME)
+
 
 
 #################
@@ -14,11 +14,11 @@ pth := $(MODULES)/$(MODULE_NAME)
 #
 #################
 
-$(OUTPUT_DIR)/reference/genes.formated: $(OUTPUT_DIR)/reference/genes.bed | $(OUTPUT_DIR)/reference
+$(REF)/genes.formated: $(REF)/genes.bed | $(REF)
 	$(info )
-	$(info Make genes.formated.)
-	cat $(OUTPUT_DIR)/reference/genes.bed | grep protein_coding | sed 's/\t/\*\*/g' > $(OUTPUT_DIR)/reference/genes.formated
-	@echo "$(timestamp) $(PIPELINE_NAME): Created protein coding genes bed at: $(OUTPUT_DIR)/reference/exons.bed\n" >> $(LOG_FILE)
+	$(info $(CALL) Make genes.formated.)
+	grep 'protein_coding' $< | sed 's/\t/\*\*/g' > $@
+	@echo "$(CALL): Created protein coding genes bed from: $<.\n"
  
 #################
 #
@@ -26,19 +26,19 @@ $(OUTPUT_DIR)/reference/genes.formated: $(OUTPUT_DIR)/reference/genes.bed | $(OU
 #
 #################
 
-$(OUTPUT_DIR)/reference/genes.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
+$(REF)/genes.bed: $(REF_ANNOTATION) | $(REF)
 	$(info )
-	$(info Make genes.bed.)
-	perl $(pth)/gtf2bed.pl 'gene' $< > $@
-	@echo "$(timestamp) $(PIPELINE_NAME): Created genes bed at: $(OUTPUT_DIR)/reference/genes.bed\n" >> $(LOG_FILE)
+	$(info Make $(CALL) genes.bed.)
+	perl $(MDL)/gtf2bed.pl 'gene' $< > $@
+	@echo "$(CALL): Created genes bed at: $@.\n"
 
 
 
-$(OUTPUT_DIR)/reference/exons.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
+$(REF)/exons.bed: $(REF_ANNOTATION) | $(REF)
 	$(info )
-	$(info Make exons.bed.)
-	perl $(pth)/gtf2bed.pl 'exon' $< > $@
-	@echo "$(timestamp) $(PIPELINE_NAME): Created exons bed at: $(OUTPUT_DIR)/reference/exons.bed\n" >> $(LOG_FILE)
+	$(info Make $(CALL) exons.bed.)
+	perl $(MDL)/gtf2bed.pl 'exon' $< > $@
+	@echo "$(CALL): Created exons bed at: $@.\n"
 
 
 
@@ -50,24 +50,21 @@ $(OUTPUT_DIR)/reference/exons.bed: $(REF_ANNOTATION) | $(OUTPUT_DIR)/reference
 
 $(OUTPUT_DIR):
 	$(info )
-	$(info Make output dir.)
-	mkdir -p $(OUTPUT_DIR)
-	@echo "$(timestamp) $(PIPELINE_NAME): Created output dir: $(OUTPUT_DIR).\n"
+	$(info $(CALL) Make output dir.)
+	mkdir -p $@
 
-$(OUTPUT_DIR)/reference:
+$(REF):
 	$(info )
-	$(info Make reference dir.)
-	mkdir -p $(OUTPUT_DIR)/reference
-	@echo "$(timestamp) $(PIPELINE_NAME): Created reference dir: $(OUTPUT_DIR)/reference.\n"
+	$(info $(CALL) Make reference dir.)
+	mkdir -p $@
 
-$(OUTPUT_DIR)/result:
+$(RES):
 	$(info )
-	$(info Make result dir.)
-	mkdir -p $(OUTPUT_DIR)/result
-	@echo "$(timestamp) $(PIPELINE_NAME): Created results dir: $(OUTPUT_DIR)/result.\n"
+	$(info $(CALL) Make result dir.)
+	mkdir -p $@
 
 $(TEMP_PROCESS_DIR):
 	$(info )
-	$(info Make tmp dir.)
-	mkdir -p $(TEMP_PROCESS_DIR)
+	$(info $(CALL) Make tmp dir.)
+	mkdir -p $@
 

@@ -27,6 +27,7 @@ CALL = [$(shell /bin/date "+%Y-%m-%d(%H:%M:%S)") $(PIPELINE_NAME)]
 MDL := $(MODULES)/$(MODULE_NAME)
 
 
+
 ############################## MAIN CODE ######################################
 
 # Presentation header.
@@ -62,4 +63,3 @@ include $(strip $(wildcard $(addprefix $(MODULES)/$(MODULE_NAME)/, $(TGT_DEFS)))
 
 
 #.PHONY: $(TGT_PHONY)
-###############################################################################

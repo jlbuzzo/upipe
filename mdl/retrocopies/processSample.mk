@@ -26,10 +26,10 @@ processSample:: $(BAM_ABNORMAL_LIST)
 #
 #################
 
-$(BAM_ABNORMAL_LIST): %.abnormal: %.bai %.bam $(OUTPUT_DIR)/reference/genes.formated
+$(BAM_ABNORMAL_LIST): %.abnormal: %.bai %.bam $(OUTPUT_DIR)/reference/genes.bed
 	$(info )
 	$(info $(CALL) Selecting abnormal pairs from file $(word 2, $^))
-	$(MDL)/findAbnormal.sh $(word 3, $^) $(word 2, $^) $(@D) > $@
+	$(MDL)/findAbnormal.sh $(word 2, $^) $(word 3, $^) $(SEARCH_CRIT) $(@D) > $@
 
 
 
