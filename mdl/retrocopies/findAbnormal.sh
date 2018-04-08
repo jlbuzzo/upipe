@@ -3,10 +3,10 @@
 ###############################################################################
 # Arguments usage:
 
-# $1: BAM file.
-# $2: Formated file.
+# $1: Source (file).
+# $2: Index file.
 # $3: Search criteria.
-# $4: OUTPUT_DIR.
+# $4: Output (dir).
 
 # Arguments validation.
 if (( ${#@} < 4 )); then
@@ -31,7 +31,7 @@ FDR=$4/genes
 mkdir -p $FDR
 
 # essential Search criteria.
-echo -e $3 > crit
+#echo -e $3 > crit
 
 
 

@@ -9,7 +9,7 @@
 # Some shortcuts.
 RES := $(OUTPUT_DIR)/result
 REF := $(OUTPUT_DIR)/reference
-
+CRIT :=
 
 #################
 #
@@ -216,6 +216,6 @@ $(RES)/putativeins: $(REF)/genes.bed | $(RES)
 	#	sort -n -k 11 | \
 	#	awk -v gene="$$j" -v start=$$START -v end=$$END '{ if ( ! ($$6 == "=" && (int($$7) >= int(start) && int($$8) <= int(end)) ) ) {print $$1,$$2,$$3,$$4,$$5,$$6,$$7,$$8,$$9,$$10,$$11,gene} else {print $$1,$$2,$$3,$$4,$$5,"removed"}}'; \
 	#done > $@
-	$(MDL)/merge.sh $< $(MDL) $(OUTPUT_DIR) > $@
+	$(MDL)/merge.sh $(OUTPUT_DIR) $< $@ $(MDL) > $@
 	@echo "$(CALL): Finished clustering abnormals in $(OUTPUT_DIR)/ into $@.\n"
 

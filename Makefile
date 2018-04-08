@@ -58,7 +58,7 @@ $(ext_proc):
 
 
 # Including targets definitions files.
-include $(strip $(wildcard $(addprefix $(MODULES)/$(MODULE_NAME)/, $(TGT_DEFS))))
+include $(strip $(wildcard $(addprefix $(MDL)/, $(TGT_DEFS))))
 #include $(TGT_EXT)
 
 

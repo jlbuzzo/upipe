@@ -1,0 +1,120 @@
+#!/bin/bash
+
+
+# Arguments validation.
+if (( ${#@} < 4 )); then
+  	echo -e "Error in $0: Not enough arguments." >&2
+	exit 1;
+fi
+
+# Reference paths.
+CONFIG_FILE=config.cfg
+BASE=/RTC
+IMG_CONF=$BASE/configutarions
+IMG_IN=$BASE/inputs
+IMG_OUT=$BASE/outputs
+IMG_ANNOTATION=$BASE/ancillaries/annotation
+IMG_GTF=$IMG_ANNOTATION/gtf
+IMG_BED=$IMG_ANNOTATION/bed
+IMG_MANUAL=$IMG_ANNOTATION/manual
+IMG_FASTA=$IMG_ANNOTATION/fasta
+
+declare -A PATH_H DIR_H FILE_H
+
+while getopts ":i:o:r:f:p:m:" OPTION; do
+	case "$OPTION" in
+		i) PATH_H["i"]=$OPTARG ;;
+		o) PATH_H["o"]=$OPTARG ;;
+		r) PATH_H["r"]=$OPTARG ;;
+		f) PATH_H["f"]=$OPTARG ;;
+		p) PATH_H["p"]=$OPTARG ;;
+		m) PATH_H["m"]=$OPTARG ;;
+		j) PATH_H["j"]=$OPTARG ;;
+	esac
+done
+
+for var in $(echo -e "i\to\tr\tf\tp\tm"); do
+	if [[ ! -v PATH_H[$var] ]]; then
+		echo -e "No flag '$var' defined." >&2
+		exit 1
+	fi
+done
+
+for var in $(echo -e "r\tf\tp\tm\to"); do
+	path="${PATH_H[$var]}"
+	DIR_H[$var]="${path%/*}"
+	FILE_H[$var]="${path##*/}"
+	
+	# Debug code.
+	#echo "dir ${DIR_H[$var]} file ${FILE_H[$var]}"
+done
+
+cat << EOF > $CONFIG_FILE
+# Module essencial macros.
+PIPELINE_NAME := RETRONATOR
+MODULE_NAME := retrocopies
+SUFFIXES := .bam
+
+# Instance variables
+INPUT_DIR := $IMG_IN
+OUTPUT_DIR := $IMG_OUT/${FILE_H[o]}
+TEMP_PROCESS_DIR := \$(OUTPUT_DIR)/temp/
+DUMP_DIR := \$(OUTPUT_DIR)/result/dump/
+
+# Anormal part.
+INPUT_FILE := \$(INPUT_DIR)
+
+# GTF
+REF_ANNOTATION := $IMG_GTF/${FILE_H[r]}
+REP_ANNOTATION := $IMG_BED/${FILE_H[p]}
+REP_ANNOTATION_manual := $IMG_MANUAL/${FILE_H[m]}
+REFERENCE_GENOME_FASTA := $IMG_FASTA/${FILE_H[f]}
+SEARCH_CRIT := mdl/retrocopies/search_crit.awk
+
+DISTANCE := 750000
+MIN_DIST := 1000000
+
+
+
+############################## GENERAL GOALS ##################################
+# Some post processing goals.
+PUBLISH :=
+DOCKERIZE :=
+
+
+# Target(s) chain variables.
+
+# Target(s) for the verifycation and validation process of the inputs.
+val_proc := validations
+
+# Target(s) for the pre processes.
+pre_proc := processSample
+
+# Target(s) for the main processes.
+mn_proc := mergeCall
+
+# Target(s) for the post processes.
+#pst_proc := target
+
+# Target(s) for the extra processes.
+#ext_proc := target
+
+
+# Target(s) definitions files and others.
+TGT_DEFS := validations.mk mergeCall.mk processSample.mk commons.mk
+TGT_EXT :=
+TGT_PHONY := \$(pre_proc)
+EOF
+
+# Run docker.
+docker run \
+	--rm \
+	-u $(id -u):$(id -g) \
+	-v "${DIR_H["r"]}:$IMG_GTF" \
+	-v "${DIR_H["f"]}:$IMG_FASTA" \
+	-v "${DIR_H["m"]}:$IMG_MANUAL" \
+	-v "${DIR_H["p"]}:$IMG_BED" \
+	-v "${PATH_H["i"]}:$IMG_IN" \
+	-v "$(pwd):$IMG_CONF" \
+	-v "${DIR_H["o"]}:$IMG_OUT" \
+	upipe make -j "${PATH_H["j"]:-10}" CONFIG_FILE=$IMG_CONF/$CONFIG_FILE
