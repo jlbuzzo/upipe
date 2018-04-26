@@ -5,7 +5,9 @@
 ###############################################################################
 
 
-
+# Some variables.
+TEMP_PROCESS_DIR := $(OUTPUT_DIR)/temp/
+DUMP_DIR := $(OUTPUT_DIR)/result/dump/
 
 
 #################

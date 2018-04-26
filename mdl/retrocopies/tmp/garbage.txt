@@ -1,0 +1,5 @@
+# Some notes...
+INPUT_PROCESSED := $(if $(shell [ -f $(INPUT_PROCESSED) ] && echo 1), $(wildcard $(filter %$(SUFFIXES), $(shell cat $(INPUT_PROCESSED)))), $(wildcard $(INPUT_FILE)/*$(SUFFIXES)))
+INPUT_PROCESSED := $(abspath $(strip $(BAM_LIST)))
+VERIFY = $(shell [ -s "$i" ] && echo "$i")
+BAM_LIST := $(strip $(foreach i, $(BAM_LIST),$(VERIFY)))
