@@ -39,16 +39,16 @@ mkdir -p $FDR
 # Main code:
 
 # 'chr' pattern extracted from BAM and formated files.
-ptn_bam=$(samtools view -H $1 2> /dev/null | head -n 2 | cut -f 2 | sed -rn '2s/SN:([^0-9]*)[0-9]*/\1/p')
+ptn_bam=$(samtools view -H $1 2> /dev/null | sed -rn '1,/@SQ/ s/SN:([^0-9]*)[0-9]*/\1/p' | cut -f 2)
 ptn_fmt=$(sed -rn '1s/^(chr|Chr|CHR).*/\1/p' $2)
 
 
 # For each gene in an annotation file, create a temporary file with abnormal alignments.
 while read CHR START END GENE; do
 	# Debug code.
-	#echo "c-$CHR st-$START ed-$END gn-$GENE; $ptn_bam${CHR:3} $2 do"
+	#echo "c-$CHR st-$START ed-$END gn-$GENE; ${ptn_bam:0:3}${CHR:3} $2 do"
 	
-	aux=$(samtools view $1 $ptn_bam${CHR:3}:$START-$END 2> /dev/null | awk '
+	aux=$(samtools view $1 ${ptn_bam:0:3}${CHR:3}:$START-$END 2> /dev/null | awk '
 		{
 			if ( ( $7 == "=" && ( $9 > 100000 || $9 < -100000) ) || ( $7 != "=" && $7 != "*" ) )
 			print "chr"$3"\t"$4"\tchr"$7"\t"$8
@@ -66,5 +66,5 @@ done < $2
 ###############################################################################
 # Finalizations:
 
-# Print and exit.
-find $FDR -type f -name '*.abnormal' -exec wc -l '{}' ';'
+# Print, trimming white spaces and exit.
+find $FDR -type f -name '*.abnormal' -print0 | xargs --null wc -l | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'

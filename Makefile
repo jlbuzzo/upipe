@@ -10,56 +10,94 @@ all:
 
 
 ############################## PREAMBLE ####################################### 
-# Essential source files to include.
-SOURCES ?= $(abspath ./src)
-aux := $(strip $(wildcard $(SOURCES)/*.mk))
-include $(if $(aux), $(SOURCES)/*.mk, $(error Sources not found!))
 
-# Ancillary configuration file (user's).
+# Include essential source files.
+SOURCES ?= $(abspath ./src)
+aux := $(abspath $(strip $(wildcard $(SOURCES)/*.mk)))
+include $(if $(aux), $(aux), $(error Sources not found))
+
+# Include user's configuration file (only the first one).
 CONFIG_FILE ?= ./config.cfg
-CONFIG_FILE := $(strip $(wildcard $(CONFIG_FILE)))
-include $(if $(CONFIG_FILE), $(CONFIG_FILE), $(error Configuration file not found!))
+aux := $(word 1, $(abspath $(strip $(wildcard $(CONFIG_FILE)))))
+include $(if $(aux), $(aux), $(error Configuration file not found))
+
+# Set modules' path (only one module).
+MDL := $(abspath $(strip $(wildcard $(addprefix $(MODULES)/, $(MODULE_NAME)))))
+$(if $(MDL),, $(error Module '$(notdir $(MDL))' not found))
 
 # Define a CALL message for the log.
-CALL = [$(shell /bin/date "+%Y-%m-%d(%H:%M:%S)") $(PIPELINE_NAME)]
+CALL = [$(UPIPE): $(shell date "+%Y-%m-%d(%H:%M:%S)")]
 
-# Shortcut to modules path.
-MDL := $(MODULES)/$(MODULE_NAME)
+# Export all variables.
+export
+# Don't export duplicated presentation message.
+unexport presentation
 
 
 
-############################## MAIN CODE ######################################
+############################## TARGETS ########################################
 
 # Presentation header.
-$(call presentation,                               $(PIPELINE_NAME), With upipe!)
+$(call presentation,                               $(UPIPE), Running: $(PIPELINE_NAME)!)
 
 
-# TARGETS' CHAIN.
 # All processes complete.
 all: $(pst_proc)
 	$(info )
-	$(info $(CALL) All processes complete.)
+	$(info $(CALL) All processes complete!)
 
-# Post processing stage.
+# Post process.
 $(pst_proc): $(mn_proc)
+	$(info )
+	$(info $(CALL) Post process: '$(pst_proc)')
+ifneq ($(strip $(pst_proc_tgt)),)
+	$(MAKE) $(pst_proc_tgt)
+endif
 
-# Main processing stage.
-$(mn_proc):: $(pre_proc)
+# Main process.
+$(mn_proc): $(pre_proc)
+	$(info )
+	$(info $(CALL) Main process: '$(mn_proc)')
+ifneq ($(strip $(mn_proc_tgt)),)
+	$(MAKE) $(mn_proc_tgt)
+endif
 
-# Pre processing stage.
-$(pre_proc):: $(val_proc)
+# Pre process.
+$(pre_proc): $(val_proc)
+	$(info )
+	$(info $(CALL) Pre process: '$(pre_proc)')
+ifneq ($(strip $(pre_proc_tgt)),)
+	$(MAKE) $(pre_proc_tgt)
+endif
 
-# Inputs' validation processing stage.
+# Validation process.
 $(val_proc):
+	$(info )
+	$(info $(CALL) Validation process: '$(val_proc)')
+ifneq ($(strip $(val_proc_tgt)),)
+	$(MAKE) $(val_proc_tgt)
+endif
 
-# Extra processes for further customizations.
+# Extra process for further customizations.
 $(ext_proc):
+	$(info )
+	$(info Extra process: '$(ext_proc)')
+ifneq ($(strip $(ext_proc_tgt)),)
+	$(MAKE) $(ext_proc_tgt)
+endif
 
 
 
-# Including targets definitions files.
-include $(strip $(wildcard $(addprefix $(MDL)/, $(TGT_DEFS))))
-#include $(TGT_EXT)
+# Include extra targets' definition files.
+aux := $(abspath $(strip $(wildcard $(TGT_EXT))))
+ifneq ($(aux),)
+$(info $(CALL) Included extra files: $(aux).)
+include $(aux)
+else
+$(info $(CALL) No extra files included.)
+endif
 
 
-#.PHONY: $(TGT_PHONY)
+
+# .PHONY targets.
+.PHONY: $(TGT_PHONY)

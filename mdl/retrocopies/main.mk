@@ -3,42 +3,38 @@
 # Main Makefile of the module.
 #
 ###############################################################################
+main:
 
 
 
 ############################## PREAMBLE ####################################### 
 
-# Essential source files to include.
-#SOURCES ?= $(abspath ./src)
-#aux := $(strip $(wildcard $(SOURCES)/*.mk))
-#include $(if $(aux), $(SOURCES)/*.mk, $(error Sources not found!))
-
-# Include the variable definitions file. Can't overwrite it.
-CONFIG_FILE ?= ./config.conf
-CONFIG := $(strip $(wildcard $(CONFIG_FILE)))
-include $(if $(CONFIG), $(CONFIG), $(error Configuration file not found))
+# Some shortcuts.
+RES := $(OUTPUT_DIR)/result
+REF := $(OUTPUT_DIR)/reference
+TEMP_PROCESS_DIR := $(OUTPUT_DIR)/temp/
+DUMP_DIR := $(RES)/dump/
+SCRIPTS := $(MDL)/scripts
+CRIT :=
 
 # Define a CALL message for the log.
-CALL = [$(shell date "+%Y-%m-%d(%H:%M:%S)") $(PIPELINE_NAME)]
-
-# Shortcut to modules' path and scripts.
-MODULES := $(abspath ../)# Dangerous path: to much specific.
-MDL := $(MODULES)/$(MODULE_NAME)
-SCRIPTS := $(MDL)/scripts
-
+CALL = [$(PIPELINE_NAME): $(shell date "+%Y-%m-%d(%H:%M:%S)")]
 
 
 ############################## TARGETS ########################################
 
-all: mergeCall
+main: mergeCall
+	$(info Main done!)
 
-mergeCall: processSample
-
-processSample: validations
-
-validations:
+count:
+	$(info )
+	$(info $(CALL) Counting retrocopies.)
+	$(SCRIPTS)/counter.sh $(OUTPUT_DIR) > counts.txt
 
 
 
 # Include target's specifications code.
-include validations.mk processSample.mk mergeCall.mk commons.mk dscasd.mk
+include $(addprefix $(MDL)/, validations.mk processSample.mk mergeCall.mk commons.mk)
+
+
+#.PHONY: validations

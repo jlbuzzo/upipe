@@ -5,9 +5,6 @@
 ###############################################################################
 
 
-# Some variables.
-TEMP_PROCESS_DIR := $(OUTPUT_DIR)/temp/
-DUMP_DIR := $(OUTPUT_DIR)/result/dump/
 
 
 #################
@@ -30,16 +27,16 @@ $(REF)/genes.formated: $(REF)/genes.bed | $(REF)
 
 $(REF)/genes.bed: $(REF_ANNOTATION) | $(REF)
 	$(info )
-	$(info Make $(CALL) genes.bed.)
-	perl $(MDL)/gtf2bed.pl 'gene' $< > $@
+	$(info $(CALL) Make genes.bed.)
+	perl $(SCRIPTS)/gtf2bed.pl 'gene' $< > $@
 	@echo "$(CALL): Created genes bed at: $@.\n"
 
 
 
 $(REF)/exons.bed: $(REF_ANNOTATION) | $(REF)
 	$(info )
-	$(info Make $(CALL) exons.bed.)
-	perl $(MDL)/gtf2bed.pl 'exon' $< > $@
+	$(info $(CALL) Make exons.bed.)
+	perl $(SCRIPTS)/gtf2bed.pl 'exon' $< > $@
 	@echo "$(CALL): Created exons bed at: $@.\n"
 
 

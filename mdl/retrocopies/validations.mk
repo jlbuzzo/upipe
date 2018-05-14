@@ -39,20 +39,28 @@ $(if $(INPUT_PROCESSED),, $(error Variabe INPUT is empty))
 
 # A limited alternative validation process (without 'ufinder' script).
 INPUT_PROCESSED := $(if $(shell [ -f $(INPUT_PROCESSED) ] && echo 1), $(wildcard $(filter %$(SUFFIXES), $(shell cat $(INPUT_PROCESSED)))), $(wildcard $(INPUT_PROCESSED)/*$(SUFFIXES)))
-INPUT_PROCESSED := $(strip $(abspath $(INPUT_PROCESSED)))
+INPUT_PROCESSED := $(abspath $(strip $(INPUT_PROCESSED)))
 
-# Verifyng SUFFIXES terminated files' remaining after the filtering of the
+# Verifying 'SUFFIXES' terminated files' remaining after the filtering of the
 # INPUT_PROCESSED list.
 $(if $(INPUT_PROCESSED),, $(error No valid $(SUFFIXES) file specified))
-$(if $(wildcard $(OUTPUT_DIR)),, $(error Output directory '$(OUTPUT_DIR)' doesnt exist))
+
+# Verifying OUTPUT_DIR previous existence.
+ifneq ($(wildcard $(OUTPUT_DIR)),)
+$(info )
+$(info $(CALL) Directory '$(OUTPUT_DIR)' will be overwritten!)
+endif
 
 # ===> DEBUG CODE <===
-#$(error Stop emergency test..)
 
+# Enable emergy stop, if variable STP1="yes".
+ifdef STP1
+$(error Emergency stop 1)
+endif
 
 
 ############################## TARGETS ########################################
 
 validations:
 	$(info )
-	$(info Target 'validations' complete!)
+	$(info $(CALL) Target 'validations' complete!)

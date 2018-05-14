@@ -1,9 +1,17 @@
-# Main configuration file.
+###############################################################################
+#
+# Variables definitions file.
+#
+###############################################################################
+
+
+
+############################## PREAMBLE ####################################### 
 
 # Essential configuration paths.
+UPIPE := UPIPE
 SOURCES ?= ./src
 MODULES ?= ./mdl
-MODULE_NAME :=
 LIBRARIES ?= ./lib
 BINARIES ?= ./bin
 DOCS ?= ./doc

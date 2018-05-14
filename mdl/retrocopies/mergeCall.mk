@@ -6,10 +6,7 @@
 
 # Preamble.
 
-# Some shortcuts.
-RES := $(OUTPUT_DIR)/result
-REF := $(OUTPUT_DIR)/reference
-CRIT :=
+
 
 #################
 #
@@ -19,9 +16,8 @@ CRIT :=
 
 mergeCall:: $(RES)/putativeins.min.norep.exonic.dist.notsimilar.orientation
 	$(info )
-	$(info $(CALL) Finished merge for files $^.)
+	$(info $(CALL) Target 'mergeCall' complete!)
 
-.NOTPARALLEL: mergeCall
 
 #################
 #
@@ -87,7 +83,7 @@ $(RES)/putativeins.min.norep.exonic.dist.notsimilar.orientation: $(RES)/putative
 			samtools view $$i/$$SAMPLE $$PAR_CHR\:$$PAR_START\-$$PAR_END | awk -v chr=$$IP_CHR2 -v start=$$IP_START -v end=$$IP_END '{if ($$7 == chr && int($$8) >= int(start) && int($$8) <= int(end) ) {print}}' | sed 's/^/'$$SAMPLE' /'; \
 			samtools view $$i/$$SAMPLE $$IP_CHR\:$$IP_START\-$$IP_END | awk -v chr=$$PAR_CHR2 -v start=$$PAR_START -v end=$$PAR_END '{if ($$7 == chr && int($$8) >= int(start) && int($$8) <= int(end) ) {print}}' | sed 's/^/'$$SAMPLE' /'; \
 		done >> $(RES)/dump/$$GENE\_$$PAR_CHR\_$$PAR_START\_$$IP_CHR\_$$IP_START.reads.abnormal; \
-		cat $(RES)/dump/$$GENE\_$$PAR_CHR\_$$PAR_START\_$$IP_CHR\_$$IP_START.reads.abnormal | perl $(MDL)/or_ip.pl -d "$$DESC" -f $(RES)/dump/temp_exons.txt > $(RES)/dump/$$GENE\_$$PAR_CHR\_$$PAR_START\_$$IP_CHR\_$$IP_START.reads.abnormal.bed 2>> $@; \
+		cat $(RES)/dump/$$GENE\_$$PAR_CHR\_$$PAR_START\_$$IP_CHR\_$$IP_START.reads.abnormal | perl $(SCRIPTS)/or_ip.pl -d "$$DESC" -f $(RES)/dump/temp_exons.txt > $(RES)/dump/$$GENE\_$$PAR_CHR\_$$PAR_START\_$$IP_CHR\_$$IP_START.reads.abnormal.bed 2>> $@; \
 		sed -i 's/chrchr/chr/g' $(RES)/dump/$$GENE\_$$PAR_CHR\_$$PAR_START\_$$IP_CHR\_$$IP_START.reads.abnormal.bed; \
 	done 
 	@echo "$(CALL): Finished recalculating Insertion Point and Support from original BAM files; Checked supporting reads orientation.\n"
@@ -106,7 +102,7 @@ $(RES)/putativeins.min.norep.exonic.dist.notsimilar: $(RES)/putativeins.min.nore
 	$(info $(CALL) Make $@.)
 	@echo "$(CALL): Removing clusters which Insertion Point is simmilar to Parental Sequence.\n"
 	RAND=$$$$ && \
-	perl $(MDL)/similarity_filter.pl -p $(TEMP_PROCESS_DIR) -f $< -g $(REFERENCE_GENOME_FASTA) > $@_debug
+	perl $(SCRIPTS)/similarity_filter.pl -p $(TEMP_PROCESS_DIR) -f $< -g $(REFERENCE_GENOME_FASTA) > $@_debug
 	awk '{if ($$NF == "IN") {print}}' $@_debug > $@
 	@echo "$(CALL): Removed clusters which Insertion Point is simmilar to Parental Sequence.\n"
 
@@ -160,8 +156,8 @@ $(RES)/putativeins.min.norep: $(RES)/putativeins.min | $(TEMP_PROCESS_DIR)
 	$(info )
 	$(info $(CALL) Make $@.)
 	@echo "$(CALL): Removing clusters overlapping Repetitive Elements annotated by Repeat Masker.\n"
-	perl $(MDL)/remove_rep.pl -p $(TEMP_PROCESS_DIR) -f $(REP_ANNOTATION) -f2 $<
-	perl $(MDL)/remove_rep.pl -p $(TEMP_PROCESS_DIR) -f $(REP_ANNOTATION_manual) -f2 $@
+	perl $(SCRIPTS)/remove_rep.pl -p $(TEMP_PROCESS_DIR) -f $(REP_ANNOTATION) -f2 $<
+	perl $(SCRIPTS)/remove_rep.pl -p $(TEMP_PROCESS_DIR) -f $(REP_ANNOTATION_manual) -f2 $@
 	mv $@.norep $@
 	@echo "$(CALL): Removed clusters overlapping Repetitive Elements annotated by Repeat Masker.\n"
 	##This should be very slow.. Is there anyway of parallezing it?
@@ -192,7 +188,7 @@ $(RES)/putativeins.min: $(RES)/putativeins
 #################
 
 #$(RES)/putativeins: $(REF)/genes.formated | $(RES)
-$(RES)/putativeins: $(REF)/genes.bed | $(RES)
+$(RES)/putativeins: processSample $(REF)/genes.bed | $(RES)
 	$(info )
 	$(info $(CALL) Make $@.)
 	#Foreach gene
@@ -212,10 +208,10 @@ $(RES)/putativeins: $(REF)/genes.bed | $(RES)
 	#	done | \
 	#	sort -k3,3V -k4,4n | \
 	#	egrep -v "GL|NC|chrMT|hs|chrM" | \
-	#	perl $(MDL)/cluster_pair.pl -w 4000 -s 5| \
+	#	perl $(SCRIPTS)/cluster_pair.pl -w 4000 -s 5| \
 	#	sort -n -k 11 | \
 	#	awk -v gene="$$j" -v start=$$START -v end=$$END '{ if ( ! ($$6 == "=" && (int($$7) >= int(start) && int($$8) <= int(end)) ) ) {print $$1,$$2,$$3,$$4,$$5,$$6,$$7,$$8,$$9,$$10,$$11,gene} else {print $$1,$$2,$$3,$$4,$$5,"removed"}}'; \
 	#done > $@
-	$(MDL)/merge.sh $(OUTPUT_DIR) $< $@ $(MDL) > $@
+	$(SCRIPTS)/merge.sh $(OUTPUT_DIR) $(word 2,$^) $@ $(SCRIPTS) > $@
 	@echo "$(CALL): Finished clustering abnormals in $(OUTPUT_DIR)/ into $@.\n"
 

@@ -45,6 +45,6 @@ while read CHR START END GENE; do
 	egrep -v "GL|NC|chrMT|hs|chrM" | \
 	perl $4/cluster_pair.pl -w 4000 -s 5 | \
 	sort -n -k 11 | \
-	awk -v gene="$j" -v start=$START -v end=$END '{ if ( ! ($6 == "=" && (int($7) >= int(start) && int($8) <= int(end)) ) ) {print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,gene} else {print $1,$2,$3,$4,$5,"removed"}}'
+	awk -v gene="$CHR $START $END $GENE" -v start=$START -v end=$END '{ if ( ! ($6 == "=" && (int($7) >= int(start) && int($8) <= int(end)) ) ) {print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,gene} else {print $1,$2,$3,$4,$5,"removed"}}'
 done < $2
 
