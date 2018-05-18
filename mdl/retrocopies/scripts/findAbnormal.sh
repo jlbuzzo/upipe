@@ -1,23 +1,23 @@
 #!/bin/bash
 
-###############################################################################
-# Arguments usage:
+############################## HEADER #########################################
 
+# Arguments usage:
+#
 # $1: Source (file).
 # $2: Index file.
 # $3: Search criteria.
 # $4: Output (dir).
+
+
+
+############################## PREAMBLE #######################################
 
 # Arguments validation.
 if (( ${#@} < 4 )); then
   	echo -e "Error in $0: Not enough arguments!" >&2
 	exit 1;
 fi
-
-
-
-###############################################################################
-# Preamble:
 
 # Counting time and iterations.
 #count_time=$(time )
@@ -30,13 +30,9 @@ FDR=$4/genes
 [[ -d "$FDR" ]] && rm -Rf $FDR
 mkdir -p $FDR
 
-# essential Search criteria.
-#echo -e $3 > crit
 
 
-
-###############################################################################
-# Main code:
+############################## MAIN CODE ######################################
 
 # 'chr' pattern extracted from BAM and formated files.
 ptn_bam=$(samtools view -H $1 2> /dev/null | sed -rn '1,/@SQ/ s/SN:([^0-9]*)[0-9]*/\1/p' | cut -f 2)
@@ -64,7 +60,6 @@ done < $2
 
 
 ###############################################################################
-# Finalizations:
 
 # Print, trimming white spaces and exit.
 find $FDR -type f -name '*.abnormal' -print0 | xargs --null wc -l | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'

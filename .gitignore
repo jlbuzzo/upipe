@@ -1,4 +1,7 @@
-save/
+outputs/
 
 timestamp*
+source_step*
+*.txt
 *.log
+*.swp

@@ -24,12 +24,13 @@ CALL = [$(PIPELINE_NAME): $(shell date "+%Y-%m-%d(%H:%M:%S)")]
 ############################## TARGETS ########################################
 
 main: mergeCall
-	$(info Main done!)
+	$(info )
+	$(info $(CALL) Main done!)
 
 count:
 	$(info )
 	$(info $(CALL) Counting retrocopies.)
-	$(SCRIPTS)/counter.sh $(OUTPUT_DIR) > counts.txt
+	$(SCRIPTS)/counter.sh $(OUTPUT_DIR) > $(OUTPUT_DIR)/counts.txt
 
 
 
