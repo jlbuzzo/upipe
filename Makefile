@@ -1,103 +1,143 @@
-###############################################################################
-#
-# A Makefile to rule'em all!
-#
-###############################################################################
-all:
+#!/usr/bin/make
+############################## HEADER ##########################################
+# Makefile for general stuff...
+################################################################################
 
 
 
 
 
-############################## PREAMBLE ####################################### 
+############################## PREAMBLE ########################################
 
-# Include essential source files.
-SOURCES ?= $(abspath ./src)
-aux := $(abspath $(strip $(wildcard $(SOURCES)/*.mk)))
-include $(if $(aux), $(aux), $(error Sources not found))
+# Command macros.
+SHELL				:= bash
+MODULE_NAME			:= main
+#CALL				:= [$(MODULE_NAME): $(shell date --utc)]
+ECHO				:= echo -e
+MKDIR				:= mkdir -p
+PING				:= ping -c1
+DOCKER_RUN			:= docker run --rm -ti
 
-# Include user's configuration file (only the first one).
-CONFIG_FILE ?= ./config.cfg
-aux := $(word 1, $(abspath $(strip $(wildcard $(CONFIG_FILE)))))
-include $(if $(aux), $(aux), $(error Configuration file not found))
 
-# Set modules' path (only one module).
-MDL := $(abspath $(strip $(wildcard $(addprefix $(MODULES)/, $(MODULE_NAME)))))
-$(if $(MDL),, $(error Module '$(notdir $(MDL))' not found))
 
-# Define a CALL message for the log.
-CALL = [$(UPIPE): $(shell date "+%Y-%m-%d(%H:%M:%S)")]
+############################## INFRASTRUCTURE ##################################
+# This section must contain only general infrastructure variables.
 
-# Export all variables.
+
+# NOTE: Varable names can end with '_d', '_f', '_r', '_t' and '_l'.
+# They represent, respectively, directories, files, references, temporaries and
+# lists values inside them.
+# Only names ending with '_l' can have non-single string values, but you can
+# compose'em: OUTPUTS_dlt (for a list of temporary directories). 
+
+
+
+############################## ENVIRONMENT TESTS ###############################
+
+# Define switch to feel environment and take configuration file.
+SWITCH			?= $(if $(shell [ -e ".ponga_switch" ] && echo "1"),1,)
+CONFIG			?= config.mk
+include			$(if $(shell [ -e "$(CONFIG)" ] && echo "1"),$(CONFIG),$(error Configuration file is missing))
+
+
+# Export all variables or not.
 export
-# Don't export duplicated presentation message.
-unexport presentation
 
 
 
-############################## TARGETS ########################################
+############################## DEBUG ###########################################
 
-# Presentation header.
-$(call presentation,                               $(UPIPE), Running: $(PIPELINE_NAME)!)
+# Debug code.
+ifeq ($(DBG),yes)
+$(info ############################## DEBUG ###########################################)
+$(info )
 
+# General variables.
+$(info CONFIG:$(CONFIG).)
+$(info TARGET0:$(TARGET0).)
+$(info TARGET1:$(TARGET1).)
+$(info )
 
-# All processes complete.
-all: $(pst_proc)
-	$(info )
-	$(info $(CALL) All processes complete!)
-
-# Post process.
-$(pst_proc): $(mn_proc)
-	$(info )
-	$(info $(CALL) Post process: '$(pst_proc)')
-ifneq ($(strip $(pst_proc_tgt)),)
-	$(MAKE) $(pst_proc_tgt)
+$(info ################################################################################)
+$(info )
 endif
 
-# Main process.
-$(mn_proc): $(pre_proc)
-	$(info )
-	$(info $(CALL) Main process: '$(mn_proc)')
-ifneq ($(strip $(mn_proc_tgt)),)
-	$(MAKE) $(mn_proc_tgt)
-endif
 
-# Pre process.
-$(pre_proc): $(val_proc)
-	$(info )
-	$(info $(CALL) Pre process: '$(pre_proc)')
-ifneq ($(strip $(pre_proc_tgt)),)
-	$(MAKE) $(pre_proc_tgt)
-endif
-
-# Validation process.
-$(val_proc):
-	$(info )
-	$(info $(CALL) Validation process: '$(val_proc)')
-ifneq ($(strip $(val_proc_tgt)),)
-	$(MAKE) $(val_proc_tgt)
-endif
-
-# Extra process for further customizations.
-$(ext_proc):
-	$(info )
-	$(info Extra process: '$(ext_proc)')
-ifneq ($(strip $(ext_proc_tgt)),)
-	$(MAKE) $(ext_proc_tgt)
+# Emergency estop.
+ifeq ($(STP),yes)
+$(error Emergency stop)
 endif
 
 
 
-# Include extra targets' definition files.
-aux := $(abspath $(strip $(wildcard $(TGT_EXT))))
-ifneq ($(aux),)
-$(info $(CALL) Included extra files: $(aux).)
-include $(aux)
-else
-$(info $(CALL) No extra files included.)
-endif
+############################## TARGETS #########################################
+
+# Help must be the first target, the default goal.
+help: 
+	$(ECHO) "Usage:\n"
+	$(ECHO) "\tmake all [options]\n"
+	$(ECHO) "\tOptions:"
+	$(ECHO) "\t\t-f\tSpecify a Makefile with another name."
+	$(ECHO) "\t\t-s\tSilent mode."
+	$(ECHO) "\t\t-j\tPropagate parallelism to sub-makes. This is serial only."
+	$(ECHO) "\t\tARGS\tSpecify extra arguments (ex. ARGS=\"arg1 arg2 ...\")."
+	$(ECHO) "\t\tCONFIG\tSpecify configuration file to parse (ex. CONFIG=\"my_config.mk\")."
+	$(ECHO) "\t\tDBG\tDebug messages (ex. DBG=yes)."
+	$(ECHO) "\t\tSTP\tEmergency stop (ex. STP=yes)."
+
+
+# This is a default testing target.
+simple_test:
+	$(ECHO) "This is a simple test for arguments:$(ARGS)."
 
 
 
-# .PHONY targets.
-.PHONY: $(TGT_PHONY)
+# All Makefile is serial, but recursive the ones can be parallelized.
+.NOTPARALLEL:
+
+# Main targetis chain.
+all: target3
+	$(ECHO) "All done.\n"
+
+# Postprocess
+target3: target2 $(TARGET3)
+	$(ECHO) "Postprocess done.\n"
+
+# Process.
+target2: target1 $(TARGET2)
+	$(ECHO) "process done.\n"
+
+# Preprocess.
+target1: target0 $(TARGET1)
+	$(ECHO) "Preprocess done.\n"
+
+# Validations.
+target0: $(TARGET0)
+	$(ECHO) "Validations done.\n"
+
+# Extra target.
+extra:
+	$(ECHO) "Extra target done.\n"
+
+
+# User targets chain.
+$(TARGET3): $(TARGET3_REQUISITES)
+	$(TARGET3_RECIPES)
+	$(ECHO) "$@ done."
+
+$(TARGET2): $(TARGET2_REQUISITES)
+	$(TARGET2_RECIPES)
+	$(ECHO) "$@ done."
+
+$(TARGET1): $(TARGET1_REQUISITES)
+	$(TARGET1_RECIPES)
+	$(ECHO) "$@ done."
+
+$(TARGET0): $(TARGET0_REQUISITES)
+	$(TARGET0_RECIPES)
+	$(ECHO) "$@ done."
+
+
+
+# Obligatory targets.
+.PHONY:

@@ -1,7 +1,70 @@
-outputs/
+############################## HEADER ##########################################
+# Repository's ignore list.
+################################################################################
 
-timestamp*
-source_step*
-*.txt
+
+
+# Ignore repository's specific files.
+#.gitignore
+#.dockerignore
+#Dockerfile
+#README.md
+#LICENSE
+#CONTRIBUTING
+#NEWS
+
+
+# Ignore repository's specific folders.
+#scripts/
+#src/
+#lib/
+#include/
+bin/
+#doc/
+#docker/
+#templates/
+#modules/
+build/
+packs/
+t/
+
+
+# Ignore structural folders.
+pocket/
+config/
+inputs/
+outputs/
+assets/
+reference/
+annotation/
+extra/
+tmp/
+
+
+# Ignore building and log files.
+#*.md
+#*.ac
+#*.am
+#*.ini
+#*.conf
+#.tt
+*.[oa]
+*.yml
 *.log
 *.swp
+*~
+*.tar.gz
+timestamp*
+
+
+# Don't ignore default configuration file.
+!default.yml
+
+
+# Ignore code files. (Don't do that!)
+#*.mk
+#*.c
+#*.h
+#*.pl
+#*.py
+#*.R

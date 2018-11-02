@@ -1,7 +1,0 @@
-./run-sh \
-	-o ponga_out \
-	-r /home/projects2/databases/gencode/release26/gencode.v26.annotation.gtf \
-	-p /home/projects2/retrocopies/upipe_RTC/ancillaries/annotation/rep.hg38.converted.bed \
-	-m /home/projects2/retrocopies/upipe_RTC/ancillaries/annotation/rep.hg38.converted.manual.bed \
-	-f /home/projects2/retrocopies/upipe_RTC/ancillaries/genomes/hg38/hg38.fa \
-	-i /home/scratch30/jlbuzzo_make/genome/
