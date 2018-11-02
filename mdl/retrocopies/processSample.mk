@@ -1,16 +1,18 @@
 ############################## HEADER #########################################
 
 # Makefile data:
-# 		Main target: processSample
+#
+# 		Default goal: processSample
 # 		File: processSample.mk
 # 		Module: retrocopies
 #		Project: upipe
 # 		Author: Jose L. L. Buzzo
 # 		Organization: RetroTeam
 # 		Year: 2018
-#
-#
+
+
 # Usage:
+#
 # 		Input args: INPUT variable (string list).
 # 					The string list must contain, at least, a path to a folder
 # 					or a file in the system.
@@ -32,7 +34,7 @@
 # ATTENTION: Variables that are string lists has an '_l' suffix appendedd to
 # the end of their names. Their behavior differently in pattern rules.
 
-# Test the succes of the validations process.
+# Test the success of the validations process.
 $(if $(INPUT_PROCESSED),, $(error "No valid input"))
 
 # Carrefully set the INPUT_l variable after success validations.
@@ -93,7 +95,7 @@ endif
 #
 #################
 
-processSample:: $(OUTPUT_ABNORMAL_l)
+processSample: $(OUTPUT_ABNORMAL_l)
 	$(info )
 	$(info $(CALL) Target 'processSample' complete!)
 
@@ -149,7 +151,7 @@ CMD = $(shell samtools view -H $(REQ) 2> /dev/null | head -n1 | cut -f3)
 BAM = $(shell readlink -f $(REQ))
 STBAM = $(shell find $(dir $(BAM)) -type f -name '*$(*F)*.sorted.bam')
 
-$(OUTPUT_l): %.bam: validations $(INPUT_l) | $(OUTPUT_DIR)
+$(OUTPUT_l): %.bam: $(INPUT_l) | validations $(OUTPUT_DIR)
 	$(info )
 	$(info $(CALL) Creating link for file: $(REQ).)
 	mkdir -p $(*D)
