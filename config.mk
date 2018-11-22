@@ -19,12 +19,12 @@
 
 # There could be an user for the container (ex. lion).
 # So, C_BASE_d must be set accordingly:
-DEFAULT_USER	:= lion
+DEFAULT_USER	:= $(if $(SWITCH),lion,)
+POCKET			:= $(if $(prefix),$(prefix),$(PWD))
 
 
 # Host's base directory, outside the container: $(PWD).
-prefix :=		$(PWD)#$(PWD)/pocket
-H_BASE_d		:= $(prefix)
+H_BASE_d		:= $(abspath $(POCKET))
 H_CONFIG_d		:= $(H_BASE_d)/config
 H_INPUTS_d		:= $(H_BASE_d)/inputs
 H_OUTPUTS_d		:= $(H_BASE_d)/outputs
@@ -47,9 +47,9 @@ C_EXTRA_d		:= $(C_BASE_d)/extra
 C_TMP_d			:= $(C_BASE_d)/tmp
 
 
-# Mount some important files in their respective folders. Must use absolute paths!
+# Mount some important files in their respective folders. Must use ionly absolute paths!
 MP_CONFIG_l		:= $(PWD)/Makefile $(PWD)/config.mk
-MP_INPUTS_l		:= $(INPUTS)
+MP_INPUTS_l		:= $(H_INPUTS_d)/ponga.txt
 MP_OUTPUTS_l	:=
 MP_ASSETS_l		:= /home/scratch60/lbuzzo/RTC/neopipe/assets/ref.perldb
 MP_REFERENCE_l	:= /home/genomes/Homo_sapiens/hg38/hg38.fa

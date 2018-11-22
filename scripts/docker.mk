@@ -252,7 +252,7 @@ docker_pull: has_docker | has_internet
 
 docker_build: has_docker $(DOCKERFILE) | has_internet
 	$(ECHO) "Building Docker image: $(IMAGE)."
-	docker build -t $(IMAGE) .
+	docker build -t $(IMAGE) - < $(DOCKERFILE)
 	$(ECHO) "Done.\n"
 
 

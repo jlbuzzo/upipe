@@ -4,17 +4,18 @@
 
 
 
-# Ignore repository's specific files.
+# Ignore repository's general files.
 #.gitignore
 #.dockerignore
 #Dockerfile
 #README.md
 #LICENSE
-#CONTRIBUTING
 #NEWS
+#CONTRIBUTING
 
 
-# Ignore repository's specific folders.
+# Ignore repository's general folders.
+#.git
 #scripts/
 #src/
 #lib/
@@ -24,41 +25,32 @@ bin/
 #docker/
 #templates/
 #modules/
-build/
+#misc/
 packs/
+build/
+dist/
+m4/
 t/
 
 
-# Ignore structural folders.
-pocket/
-config/
-inputs/
-outputs/
-assets/
-reference/
-annotation/
-extra/
-tmp/
-
-
-# Ignore building and log files.
+# Ignore general doc, building, timestamp and log files.
 #*.md
+#*.tex
 #*.ac
 #*.am
-#*.ini
-#*.conf
-#.tt
-*.[oa]
+#*.in
+#*.tt
 *.yml
+*.conf
+*.ini
 *.log
+*.[oa]
+*.so
 *.swp
 *~
 *.tar.gz
-timestamp*
-
-
-# Don't ignore default configuration file.
-!default.yml
+*tmp*
+*timestamp*
 
 
 # Ignore code files. (Don't do that!)
@@ -68,3 +60,31 @@ timestamp*
 #*.pl
 #*.py
 #*.R
+#*.r
+
+
+# Don't ignore general defaults configuration file.
+!defaults.yml
+
+
+# Ignore runtime structural folders.
+*pocket/
+*config/
+*inputs/
+*outputs/
+*assets/
+*reference/
+*annotation/
+*extra/
+*tmp/
+
+*outputs/imgs/
+*outputs/docs/
+*outputs/plots/
+*outputs/models/
+*outputs/results/
+*outputs/templates/
+*outputs/timestamps/
+
+
+# Ignore repository's specific folders.
